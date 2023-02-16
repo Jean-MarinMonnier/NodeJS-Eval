@@ -1,0 +1,369 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "3.0.0",
+    "title": "API REST BLIZZARD",
+    "description": "Une API REST pour Blizzard"
+  },
+  "host": "localhost:3000",
+  "basePath": "/",
+  "schemes": ["http"],
+  "securityDefinitions": {
+    "Bearer": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header",
+      "description": "Entrez le token avec le préfixe 'Bearer:' e.g. : Bearer abcde12345...."
+    }
+  },
+  "consumes": ["application/json"],
+  "produces": ["application/json"],
+  "paths" : {
+    "/api/auth/signup": {
+      "post": {
+        "tags": ["User"],
+        "summary": "Création d'un utilisateur",
+        "parameters": [
+          {
+            "name": "user",
+            "in": "body",
+            "description": "Utilisateur à crée. A mettre dans une clé \"user\"",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Utilisateur crée !"
+          },
+          "400": {
+            "description": "Erreur renvoyée par l'API."
+          },
+          "500": {
+            "description": "Utilisateur non autorisé."
+          }
+        },
+        "produces": ["application/json"]
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": ["User"],
+        "summary": "Connexion d'un utilisateur",
+        "parameters": [
+          {
+            "name": "user",
+            "in": "body",
+            "description": "Connexion d'un utlisateur avec ses identifiants. A mettre dans une clé \"user\"",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email":{
+                  "type": "string"
+                },
+                "password":{
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Connexion réussie !",
+            "schema": {
+              "type": "object",
+              "properties":{
+                "token": {
+                  "type": "string"
+                },
+                "userId": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Erreur renvoyée par l'API."
+          },
+          "500": {
+            "description": "Erreur renvoyée par l'API."
+          }
+        },
+        "produces": ["application/json"]
+      }
+    },
+    "/api/auth/loginWithBlizzard": {
+      "post": {
+        "tags": ["User"],
+        "summary": "Connexion d'un utilisateur",
+        "parameters": [
+          {
+            "name": "user",
+            "in": "body",
+            "description": "Connexion d'un utlisateur avec ses identifiants depuis l'API Blizzard. A mettre dans une clé \"user\"",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "username":{
+                  "type": "string"
+                },
+                "password":{
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Connexion réussie !",
+            "schema": {
+              "type": "object",
+              "properties":{
+                "token": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Erreur renvoyée par l'API."
+          }
+        },
+        "produces": ["application/json"]
+      }
+    },
+    "/api/character": {
+      "get": {
+        "tags": ["Character"],
+        "summary": "Liste tous les personnages associés à l'utilisateur",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retourne une liste de Characters",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Character"
+              }
+            }
+          },
+          "400": {
+            "description": "Erreur retournée par l'API"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Character"],
+        "summary": "Crée un personnage",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "character",
+            "in": "body",
+            "description": "Nouvel objet à créer. A mettre dans une clé \"character\"",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "character": {
+                  "$ref": "#/definitions/Character"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Personnage crée !"
+          },
+          "400": {
+            "description": "Erreur renvoyée par l'API."
+          },
+          "401": {
+            "description": "Utilisateur non autorisé."
+          }
+        },
+        "produces": ["application/json"]
+      }
+
+    },
+    "/api/character/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "ID de l'objet",
+          "type": "string"
+        }
+      ],
+      "delete": {
+        "tags": ["Character"],
+        "summary": "Supprime un personnage",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Personnage supprimé !",
+            "schema": {
+              "$ref": "#/definitions/Character"
+            }
+          },
+          "400": {
+            "description": "Personnage non trouvé !"
+          },
+          "401": {
+            "description": "L'utilisateur n'est pas authentifié !"
+          }
+        },
+        "produces": ["application/json"]
+      }
+    },
+    "/api/character/{pseudo}/{class}": {
+      "get": {
+        "tags": ["Character"],
+        "parameters": [
+          {
+            "name": "pseudo",
+            "in": "path",
+            "required": true,
+            "description": "pseudo du personnage",
+            "type": "string"
+          },
+          {
+            "name": "class",
+            "in": "path",
+            "required": true,
+            "description": "classe du personnage",
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Retourne un personnage",
+        "responses": {
+          "200": {
+            "description": "Retourne un personnage en fonction de son pseudo et de sa classe",
+            "schema": {
+              "$ref": "#/definitions/Character"
+            }
+          },
+          "400": {
+            "description": "Erreur retournée par l'API"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Character"
+        ],
+        "summary": "Modifie un personnage",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "pseudo",
+            "in": "path",
+            "required": true,
+            "description": "pseudo du personnage",
+            "type": "string"
+          },
+          {
+            "name": "class",
+            "in": "path",
+            "required": true,
+            "description": "classe du personnage",
+            "type": "string"
+          },
+          {
+            "name": "character",
+            "in": "body",
+            "description": "Personnage à modifier. A mettre dans une clé \"character\"",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "character": {
+                  "$ref": "#/definitions/Character"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Personnage modifié !",
+            "schema": {
+              "$ref": "#/definitions/Character"
+            }
+          },
+          "400": {
+            "description": "Personnage non trouvé !"
+          },
+          "401": {
+            "description": "Ce n'est pas l'objet de l'utilisateur / Utilisateur non authentifié"
+          }
+        },
+        "produces": [
+          "application/json"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "User": {
+      "required": ["email", "password", "isAdmin"],
+      "type": "object",
+      "properties": {
+        "email":{
+          "type": "string"
+        },
+        "password":{
+          "type": "string"
+        },
+        "isAdmin":{
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "Character": {
+      "required": ["pseudo", "class", "level", "userId"],
+      "type": "object",
+      "properties": {
+        "pseudo": {
+          "type": "string"
+        },
+        "class": {
+          "type": "string",
+          "enum": ["guerrier", "paladin", "chasseur", "voleur", "prêtre", "chaman", "mage", "démoniste", "moine", "druide", "chasseur de démons", "chevalier de la mort", "évocateur"]
+        },
+        "level": {
+          "type": "number"
+        },
+        "userId": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
+
